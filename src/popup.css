@@ -1,0 +1,322 @@
+/* =========================
+   Design Tokens
+   ========================= */
+:root {
+  color-scheme: light;
+  --green-bg: #59a78f;
+  --green-deep: #4e9882;
+  --text-main: #f8fff9;
+  --text-soft: #d8f0e6;
+  --line: rgba(255, 255, 255, 0.35);
+  --button-bg: rgba(255, 255, 255, 0.16);
+  --button-bg-strong: rgba(255, 255, 255, 0.24);
+}
+
+/* =========================
+   Base
+   ========================= */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  border-radius: 24px;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--green-bg), var(--green-deep));
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(180deg, var(--green-bg), var(--green-deep));
+  color: var(--text-main);
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+button {
+  border-radius: 0;
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-main);
+  padding: 0;
+}
+
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: 48px;
+  line-height: 1;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* =========================
+   Layout
+   ========================= */
+.app {
+  width: 300px;
+  min-height: 220px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: transparent;
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.timer-screen {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 6px;
+  flex: 1;
+  min-height: 200px;
+}
+
+/* =========================
+   Progress Ring
+   ========================= */
+.progress-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200px;
+  height: 200px;
+  transform: translate(-50%, -50%) rotate(-90deg);
+  pointer-events: none;
+}
+
+.progress-ring__track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.18);
+  stroke-width: 4;
+}
+
+.progress-ring__fill {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.72);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: 552.92;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 1s linear;
+}
+
+.timer-row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 0;
+}
+
+.controls-row {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+/* =========================
+   Components
+   ========================= */
+.mode-toggle-btn {
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid #ffffff;
+  background: #59a78f;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+}
+
+.mode-toggle-btn:hover,
+.mode-toggle-btn:focus-visible {
+  background: #ffffff;
+  color: #000;
+}
+
+.header-focus-btn {
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--text-main);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.header-focus-btn:hover,
+.header-focus-btn:focus-visible {
+  background: rgba(255, 255, 255, 0.26);
+}
+
+.timer-adjust-btn {
+  width: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-main);
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1;
+  transition: transform 0.08s ease, opacity 0.08s ease;
+}
+
+.timer-adjust-btn:hover,
+.timer-adjust-btn:focus-visible {
+  background: transparent;
+}
+
+.timer-adjust-btn:active {
+  transform: scale(0.9);
+  opacity: 0.78;
+}
+
+#decrease-duration {
+  justify-self: start;
+}
+
+#increase-duration {
+  justify-self: end;
+}
+
+.timer-display {
+  margin: 0;
+  grid-column: 2;
+  min-width: 108px;
+  text-align: center;
+  cursor: text;
+}
+
+.timer-display:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.8);
+  outline-offset: 2px;
+}
+
+.timer-editor {
+  grid-column: 2;
+  width: 108px;
+  min-height: 42px;
+  padding: 0 8px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+}
+
+.primary {
+  background: transparent;
+}
+
+.icon-btn {
+  min-width: 40px;
+  min-height: 34px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: 24px;
+  line-height: 1;
+  transition: transform 0.08s ease, opacity 0.08s ease;
+}
+
+.icon-btn:hover,
+.icon-btn:focus-visible {
+  background: transparent;
+}
+
+.icon-btn:active {
+  transform: scale(0.9);
+  opacity: 0.78;
+}
+
+.ghost-icon-btn {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  border: 0;
+  border-radius: 0;
+  font-size: 18px;
+  line-height: 1;
+  background: transparent;
+  transition: transform 0.12s ease;
+}
+
+.ghost-icon-btn:hover,
+.ghost-icon-btn:focus-visible {
+  background: transparent;
+}
+
+.ghost-icon-btn:hover {
+  transform: scale(1.12);
+}
+
+.settings-icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+  filter: brightness(0) saturate(100%) invert(100%);
+}
+
+.play-icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+  filter: brightness(0) saturate(100%) invert(100%);
+}
+
+.tag-chip {
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-soft);
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  min-height: 26px;
+  padding: 0 10px;
+}
+
+.tag-chip:hover,
+.tag-chip:focus-visible {
+  background: rgba(255, 255, 255, 0.16);
+  color: var(--text-main);
+}
+
+/* =========================
+   Utilities / States
+   ========================= */
+button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.hidden {
+  display: none;
+}

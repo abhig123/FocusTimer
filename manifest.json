@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "Focus Timer",
+  "version": "0.1.1",
+  "description": "Simple focus timer with tags, stats, and Google sync.",
+  "permissions": [
+    "storage",
+    "identity",
+    "alarms",
+    "tabs",
+    "offscreen"
+  ],
+  "host_permissions": [
+    "<all_urls>",
+    "https://www.googleapis.com/*",
+    "https://identitytoolkit.googleapis.com/*",
+    "https://firestore.googleapis.com/*"
+  ],
+  "oauth2": {
+    "client_id": "YOUR_GOOGLE_OAUTH_CLIENT_ID.apps.googleusercontent.com",
+    "scopes": [
+      "openid",
+      "email",
+      "profile"
+    ]
+  },
+  "action": {
+    "default_popup": "src/popup.html",
+    "default_title": "Focus Timer"
+  },
+  "options_page": "src/settings/index.html",
+  "background": {
+    "service_worker": "src/gen/background.js",
+    "type": "module"
+  }
+}

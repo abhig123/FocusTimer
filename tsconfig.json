@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["chrome"],
+    "allowJs": false,
+    "strict": false,
+    "skipLibCheck": true,
+    "rootDir": "src",
+    "outDir": "src/gen",
+    "sourceMap": false,
+    "noEmitOnError": true
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/gen", "node_modules", "**/*.test.ts"]
+}

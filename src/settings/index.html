@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Focus Timer Settings</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="layout">
+      <header class="top-banner">
+        <div class="brand-wrap">
+          <h1 class="brand" aria-label="Focus Timer">Focus Sessions</h1>
+        </div>
+      </header>
+
+      <aside class="sidebar" aria-label="Settings navigation">
+        <button class="nav-link active" type="button" data-target="stats"><span>Stats</span></button>
+        <button class="nav-link" type="button" data-target="timer"><span>Timer</span></button>
+        <button class="nav-link" type="button" data-target="blocklist"><span>Blocklist</span></button>
+        <button class="nav-link" type="button" data-target="allowlist"><span>Allowlist</span></button>
+      </aside>
+
+      <section class="content" aria-label="Settings content">
+        <div id="stats" class="section-card">
+          <div class="stats-week-nav">
+            <strong id="stats-week-range" class="stats-week-range">Current week</strong>
+          </div>
+
+          <div class="week-summary" aria-live="polite">
+            <span class="week-label">Week average</span>
+            <strong id="seven-day-average">0m/day</strong>
+          </div>
+
+          <div class="stats-chart-shell">
+            <div id="seven-day-chart" class="bar-chart" role="img" aria-label="Focus minutes in the last 7 days"></div>
+            <div class="stats-chart-controls" aria-label="Week navigation">
+              <button id="stats-week-prev" class="stats-arrow-btn" type="button" aria-label="Previous week">
+                <span aria-hidden="true">&#9664;</span>
+              </button>
+              <button id="stats-week-next" class="stats-arrow-btn" type="button" aria-label="Next week">
+                <span aria-hidden="true">&#9654;</span>
+              </button>
+              <button id="stats-week-current" class="stats-week-current-btn" type="button">This week</button>
+            </div>
+            <label class="stats-weekend-toggle" for="stats-exclude-weekends">
+              <input id="stats-exclude-weekends" type="checkbox" />
+              <span>Exclude weekends</span>
+            </label>
+          </div>
+        </div>
+
+        <div id="timer" class="card section-card timer-card">
+          <div class="timer-grid">
+            <div class="timer-row">
+              <label class="field-label" for="default-duration">Focus duration</label>
+              <div class="number-with-unit">
+                <input id="default-duration" type="number" min="1" max="240" step="1" />
+                <span>min</span>
+              </div>
+            </div>
+
+            <div class="timer-row">
+              <label class="field-label" for="break-duration">Break duration</label>
+              <div class="number-with-unit">
+                <input id="break-duration" type="number" min="1" max="120" step="1" />
+                <span>min</span>
+              </div>
+            </div>
+
+            <div class="timer-field">
+              <label class="field-label" for="end-of-day-hour">End of day</label>
+              <select id="end-of-day-hour">
+                <option value="23">11:00 PM</option>
+                <option value="0">12:00 AM (midnight)</option>
+                <option value="1">1:00 AM</option>
+                <option value="2">2:00 AM</option>
+                <option value="3">3:00 AM</option>
+                <option value="4">4:00 AM</option>
+              </select>
+            </div>
+
+            <div class="timer-field">
+              <label class="field-label" for="end-timer-sound">End of timer sound</label>
+              <div class="sound-control-row">
+                <select id="end-timer-sound">
+                  <option value="none">None</option>
+                  <option value="bell1">Bell 1</option>
+                  <option value="bell2">Bell 2</option>
+                </select>
+                <button id="preview-end-timer-sound" class="preview-sound-btn" type="button">Preview</button>
+              </div>
+            </div>
+
+            <div class="timer-field">
+              <label class="field-label" for="end-break-sound">End of break sound</label>
+              <div class="sound-control-row">
+                <select id="end-break-sound">
+                  <option value="none">None</option>
+                  <option value="bell1">Bell 1</option>
+                  <option value="bell2">Bell 2</option>
+                </select>
+                <button id="preview-end-break-sound" class="preview-sound-btn" type="button">Preview</button>
+              </div>
+            </div>
+
+            <div class="toggle-row">
+              <span class="field-label">Show timer in toolbar</span>
+              <label class="switch" for="toolbar-visible-toggle">
+                <input id="toolbar-visible-toggle" type="checkbox" />
+                <span class="switch-track" aria-hidden="true"></span>
+              </label>
+            </div>
+
+            <div class="timer-field">
+              <label class="field-label" for="toolbar-display-mode">Toolbar display style</label>
+              <select id="toolbar-display-mode">
+                <option value="icon">Icon only</option>
+                <option value="time">Remaining time</option>
+                <option value="progress">Progress circle</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div id="blocklist" class="section-card list-panel">
+          <h2 class="list-heading">During a planting session, you <span>cannot</span> visit the following websites</h2>
+          <p class="list-subtext">You can switch between Blocklist/Allowlist mode on the planting page</p>
+          <label class="sr-only" for="blocklist-input">Blocklist URL input</label>
+          <input id="blocklist-input" class="list-input" type="text" placeholder="Please enter the URL of the website here" />
+
+          <ul id="blocklist-sites" class="site-list" aria-label="Blocklisted websites"></ul>
+        </div>
+
+        <div id="allowlist" class="section-card list-panel">
+          <h2 class="list-heading">During a planting session, you can only visit the following websites</h2>
+          <p class="list-subtext">You can switch between Blocklist/Allowlist mode on the planting page</p>
+          <label class="sr-only" for="allowlist-input">Allowlist URL input</label>
+          <input id="allowlist-input" class="list-input" type="text" placeholder="Please enter the URL of the website here" />
+
+          <ul id="allowlist-sites" class="site-list" aria-label="Allowlisted websites"></ul>
+        </div>
+
+
+      </section>
+    </main>
+
+    <script type="module" src="../gen/settings/index.js"></script>
+  </body>
+</html>

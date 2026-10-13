@@ -1,0 +1,54 @@
+:root {
+  color-scheme: light;
+  --bg: #edf3f0;
+  --card: #ffffff;
+  --line: #d8e4dd;
+  --text: #22352c;
+  --subtext: #5c7066;
+  --accent: #3f9b7f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 20% 10%, #f7fcf9, var(--bg));
+  color: var(--text);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.blocked-wrap {
+  width: min(640px, 92vw);
+}
+
+.blocked-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 16px 36px rgba(26, 45, 35, 0.12);
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(28px, 5vw, 40px);
+  letter-spacing: -0.02em;
+}
+
+.blocked-subtitle {
+  margin: 12px 0 0;
+  color: var(--subtext);
+  font-size: 18px;
+}
+
+.blocked-site {
+  margin: 14px 0 0;
+  color: var(--accent);
+  font-size: 16px;
+  font-weight: 600;
+}

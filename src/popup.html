@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Focus Timer</title>
+    <link rel="stylesheet" href="./popup.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="top-row" aria-label="Actions">
+        <button id="settings" class="ghost-icon-btn" type="button" aria-label="Settings" title="Settings">
+          <img class="settings-icon" src="./assets/settings.svg" alt="" aria-hidden="true" />
+        </button>
+        <button id="mode-toggle" class="mode-toggle-btn" type="button" aria-live="polite" title="Blocklist mode enabled (Tap to switch to Allowlist mode)">Blocklist mode</button>
+        <button id="header-focus" class="header-focus-btn" type="button" aria-label="Today focus" title="View stats" aria-live="polite">0m</button>
+      </header>
+      <section class="timer-screen">
+        <svg class="progress-ring" viewBox="0 0 200 200" aria-hidden="true">
+          <circle class="progress-ring__track" cx="100" cy="100" r="88" />
+          <circle class="progress-ring__fill" id="progress-ring-fill" cx="100" cy="100" r="88" />
+        </svg>
+        <div class="timer-row" aria-label="Timer duration controls">
+          <button id="decrease-duration" class="timer-adjust-btn" type="button" aria-label="Decrease timer by 10 minutes" title="Decrease by 10 minutes">&lt;</button>
+          <h1 id="remaining" class="timer-display" role="button" tabindex="0" aria-label="Timer duration. Click to edit">25:00</h1>
+          <input id="timer-editor" class="timer-editor hidden" type="text" inputmode="numeric" maxlength="5" aria-label="Edit timer duration in minutes" title="Type minutes (10 to 240), then press Enter" />
+          <button id="increase-duration" class="timer-adjust-btn" type="button" aria-label="Increase timer by 10 minutes" title="Increase by 10 minutes">&gt;</button>
+        </div>
+        <!-- <button id="tag-picker" class="tag-chip" type="button" aria-label="Select tag" title="Select tag">#no-tag</button> -->
+        <div class="controls-row">
+          <button id="play" class="primary icon-btn" type="button" aria-label="Play" title="Play">
+            <img class="play-icon" src="./assets/play.svg" alt="" aria-hidden="true" />
+          </button>
+          <button id="pause" class="primary icon-btn hidden" type="button" aria-label="Pause" title="Pause">&#10074;&#10074;</button>
+          <button id="reset" class="icon-btn" type="button" aria-label="Reset" title="Reset" disabled>&#8635;</button>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="./gen/popup.js"></script>
+  </body>
+</html>
