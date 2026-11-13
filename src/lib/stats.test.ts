@@ -164,12 +164,13 @@ describe("reset behavior", () => {
     expect(getResetSessionEndedAt(null, now)).toBe(now);
   });
 
-  it("records reset metadata without counting reset sessions toward focus totals", () => {
+  it("records reset metadata while preserving the already-focused total", () => {
     const now = new Date("2025-07-21T12:00:00").getTime();
     const startedAt = now - 10 * 60 * 1000;
+    const focusedMs = 7 * 60 * 1000;
     const currentSession = {
       startedAt,
-      focusedMs: 7 * 60 * 1000,
+      focusedMs,
       lastCommittedAt: now - 3 * 60 * 1000,
       tags: ["work"]
     };
@@ -180,12 +181,12 @@ describe("reset behavior", () => {
     expect(record.endedAt).toBe(now);
     expect(record.actualDurationMs).toBe(10 * 60 * 1000);
     expect(record.originalDurationMs).toBe(25 * 60 * 1000);
-    expect(record.focusedMs).toBe(0);
+    expect(record.focusedMs).toBe(focusedMs);
     expect(record.tags).toEqual(["work"]);
 
     const totals = computeTotals({ sessions: [record], now });
-    expect(totals.weekHours).toBe(0);
-    expect(totals.monthHours).toBe(0);
+    expect(totals.weekHours).toBeCloseTo(focusedMs / (1000 * 60 * 60));
+    expect(totals.monthHours).toBeCloseTo(focusedMs / (1000 * 60 * 60));
   });
 });
 

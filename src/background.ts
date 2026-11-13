@@ -782,6 +782,10 @@ async function resumeTimer() {
 
 async function resetTimer() {
   if (state.currentSession) {
+    if (state.timer.status === "running") {
+      commitRunningChunk();
+    }
+
     const endedAt = getResetSessionEndedAt(state.currentSession);
     const record = createResetSessionRecord(
       state.currentSession,

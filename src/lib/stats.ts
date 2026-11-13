@@ -117,12 +117,13 @@ export function createResetSessionRecord(
   const startedAt = Number(currentSession?.startedAt);
   const safeStartedAt = Number.isFinite(startedAt) ? startedAt : Math.max(0, endedAt - originalDurationMs);
   const safeEndedAt = Number.isFinite(Number(currentSession?.endedAt)) ? Number(currentSession?.endedAt) : endedAt;
+  const focusedMs = Math.max(0, Number(currentSession?.focusedMs) || 0);
 
   return {
     id: currentSession?.id,
     startedAt: safeStartedAt,
     endedAt: safeEndedAt,
-    focusedMs: 0,
+    focusedMs,
     actualDurationMs: Math.max(0, safeEndedAt - safeStartedAt),
     originalDurationMs: Math.max(0, Number(originalDurationMs) || 0),
     tags: Array.isArray(currentSession?.tags) ? currentSession.tags : [],
