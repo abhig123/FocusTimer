@@ -1,6 +1,9 @@
 import { firebaseConfig } from "./config.js";
 import { createResetSessionRecord, getResetSessionEndedAt } from "./lib/stats.js";
-import { normalizeTagOption, normalizeSiteEntry, normalizeSiteList } from "./lib/utils.js";
+import { normalizeTagOption } from "./lib/utils.js";
+import { normalizeSiteList } from "./features/blocking/sites.js";
+import { enforceWebsiteRules } from "./features/blocking/enforcement.js";
+import type { BlockingSettings } from "./features/blocking/types.js";
 
 const DEFAULT_DURATION_MIN = 25;
 const DEFAULT_BREAK_DURATION_MIN = 5;
@@ -10,7 +13,6 @@ const MAX_TIMER_DURATION_MIN = 240;
 const MIN_BREAK_DURATION_MIN = 1;
 const MAX_BREAK_DURATION_MIN = 120;
 const STORAGE_KEY = "focusTimerData";
-const BLOCKED_PAGE_PATH = "src/blocked.html";
 const OFFSCREEN_AUDIO_PATH = "src/offscreen.html";
 const DEFAULT_TAG_OPTIONS = ["work", "study", "reading", "writing", "coding"];
 const COMPLETE_ALARM_NAME = "focus-timer-complete";
@@ -54,11 +56,10 @@ type UserInfo = {
   name: string;
 };
 
-type ListMode = "blocklist" | "allowlist";
 type SoundOption = "none" | "bell1" | "bell2";
 type ToolbarDisplayMode = "icon" | "time" | "progress";
 
-type Settings = {
+type Settings = BlockingSettings & {
   defaultDurationMin: number;
   breakDurationMin: number;
   endOfDayHour: 23 | 0 | 1 | 2 | 3 | 4;
@@ -66,9 +67,6 @@ type Settings = {
   endBreakSound: SoundOption;
   toolbarDisplayMode: ToolbarDisplayMode;
   tagOptions: string[];
-  blocklistSites: string[];
-  allowlistSites: string[];
-  listMode: ListMode;
 };
 
 type AppState = {
@@ -292,72 +290,6 @@ async function playSoundEffect(sound: SoundOption) {
     type: "PLAY_SOUND",
     payload: { sound }
   });
-}
-
-function isHttpOrHttps(url: string): boolean {
-  return url.startsWith("http://") || url.startsWith("https://");
-}
-
-function isBlockedPageUrl(url: string): boolean {
-  return url.startsWith(chrome.runtime.getURL(BLOCKED_PAGE_PATH));
-}
-
-function hostnameMatchesSite(hostname: string, site: string): boolean {
-  return hostname === site || hostname.endsWith(`.${site}`);
-}
-
-function isHostnameInList(hostname: string, sites: string[]): boolean {
-  return sites.some((site) => hostnameMatchesSite(hostname, site));
-}
-
-function getNavigationBlockReason(url: string): "blocked" | "not-allowed" | null {
-  if (state.timer.status !== "running") {
-    return null;
-  }
-
-  if (!isHttpOrHttps(url) || isBlockedPageUrl(url)) return null;
-
-  let hostname = "";
-  try {
-    hostname = normalizeSiteEntry(new URL(url).hostname);
-  } catch {
-    return null;
-  }
-
-  if (!hostname) return null;
-
-  const { listMode, blocklistSites, allowlistSites } = state.settings;
-
-  if (listMode === "blocklist") {
-    return isHostnameInList(hostname, blocklistSites) ? "blocked" : null;
-  }
-
-  return isHostnameInList(hostname, allowlistSites) ? null : "not-allowed";
-}
-
-function buildBlockedPageUrl(reason: "blocked" | "not-allowed", originalUrl: string): string {
-  let site = "";
-  try {
-    site = normalizeSiteEntry(new URL(originalUrl).hostname);
-  } catch {
-    site = "";
-  }
-
-  const params = new URLSearchParams({
-    reason,
-    site,
-    url: originalUrl
-  });
-
-  return chrome.runtime.getURL(`${BLOCKED_PAGE_PATH}?${params.toString()}`);
-}
-
-async function enforceWebsiteRules(tabId: number, url: string): Promise<void> {
-  const reason = getNavigationBlockReason(url);
-  if (!reason) return;
-
-  const blockedPageUrl = buildBlockedPageUrl(reason, url);
-  await chrome.tabs.update(tabId, { url: blockedPageUrl });
 }
 
 function formatUser(userInfo: { localId?: string; email?: string; displayName?: string }): UserInfo {
@@ -1045,7 +977,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   const url = changeInfo.url || tab.url;
   if (!url) return;
 
-  void ready.then(() => enforceWebsiteRules(tabId, url)).catch(() => {
+  void ready.then(() => enforceWebsiteRules(tabId, url, state.timer.status, state.settings)).catch(() => {
     // Ignore background enforcement failures for individual navigation events.
   });
 });

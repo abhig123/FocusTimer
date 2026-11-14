@@ -1,3 +1,5 @@
+import type { ListMode } from "./features/blocking/types.js";
+import { getModeLabel, getModeHint } from "./features/blocking/mode.js";
 import { formatDuration, parseEditedDurationMinutes, MIN_DURATION_MINUTES, MAX_DURATION_MINUTES } from "./lib/utils.js";
 import {
   normalizeEndOfDayHour,
@@ -46,7 +48,6 @@ type PopupState = {
   };
 };
 
-type ListMode = "blocklist" | "allowlist";
 
 let appState: PopupState | null = null;
 let refreshTimer: number | null = null;
@@ -56,16 +57,6 @@ let tagOptions = ["work", "study", "reading", "writing", "coding"];
 let listMode: ListMode = "blocklist";
 let isEditingDuration = false;
 let lastStateSyncAt = 0;
-
-function getModeLabel(mode: ListMode) {
-  return mode === "allowlist" ? "Allowlist mode" : "Blocklist mode";
-}
-
-function getModeHint(mode: ListMode) {
-  return mode === "allowlist"
-    ? "Allowlist mode enabled (Tap to switch to Blocklist mode)"
-    : "Blocklist mode enabled (Tap to switch to Allowlist mode)";
-}
 
 function renderMode(mode: ListMode) {
   if (el.modeToggle) {

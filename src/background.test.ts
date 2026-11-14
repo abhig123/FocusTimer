@@ -133,6 +133,26 @@ describe("background timer controls", () => {
     delete (globalThis as any).ImageData;
   });
 
+  it("enforces website rules through the tab listener and stops enforcing when paused", async () => {
+    await sendMessage("UPDATE_SETTINGS", { blocklistSites: ["example.com"] });
+    await sendMessage("START_TIMER", { durationMinutes: 25 });
+    const onUpdated = chromeMock.tabs.onUpdated.addListener.mock.calls[0][0];
+
+    onUpdated(42, { url: "https://example.com/path" }, {});
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(chromeMock.tabs.update).toHaveBeenCalledWith(42, {
+      url: expect.stringContaining("src/features/blocking/blocked.html?")
+    });
+
+    chromeMock.tabs.update.mockClear();
+    await sendMessage("PAUSE_TIMER");
+    onUpdated(42, {}, { url: "https://example.com/path" });
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(chromeMock.tabs.update).not.toHaveBeenCalled();
+  });
+
   it("plays the timer and starts a running session", async () => {
     const response = await sendMessage("START_TIMER", {
       tags: ["work", "study"],

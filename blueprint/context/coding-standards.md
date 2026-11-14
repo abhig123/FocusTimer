@@ -7,20 +7,21 @@ This project is a Chrome extension written in TypeScript. The conventions below 
 - Strict mode is enabled in the TypeScript config.
 - Prefer explicit interfaces for extension state, session data, and settings payloads.
 - Avoid `any`; use narrow types or `unknown` when runtime data is uncertain.
-- Keep business logic in pure helper modules under `src/lib` and let popup/background code orchestrate the browser APIs.
+- Keep business logic in pure helper modules under `src/lib` or the owning feature folder, and let popup/background code orchestrate the browser APIs.
 
 ## Browser extension conventions
 
 - Treat `chrome.storage.local`, `chrome.runtime`, `chrome.tabs`, `chrome.identity`, and `chrome.offscreen` as the product boundary.
-- Keep DOM access and user interaction in the popup or settings entry points.
-- Keep background behavior centralized in `src/background.ts` and use generated output under `src/gen` for runtime JS.
+- Keep DOM access and user interaction in page entry points or their feature UI controllers, not in pure rule modules.
+- Keep background orchestration centralized in `src/background.ts`, delegate blocking rules and redirects to `src/features/blocking`, and use generated output under `src/gen` for runtime JS.
 - Normalize and sanitize user-provided values before they are saved, especially tags and website entries.
 
 ## File organization
 
 - Entry points: `src/*.ts` and `src/*.html`
 - Shared logic: `src/lib/*.ts`
-- Settings UI: `src/settings/*`
+- Website blocking: `src/features/blocking/*`, including rules, site helpers, settings controller, and blocked-page assets
+- Settings UI entry point and page: `src/settings/*`
 - Generated runtime files: `src/gen/*`
 - Do not hand-edit generated JS in `src/gen`; regenerate it with the TypeScript build.
 
@@ -41,7 +42,7 @@ This project is a Chrome extension written in TypeScript. The conventions below 
 
 - Session and settings state live in Chrome local storage and are read by the popup/background logic.
 - Optional Google auth and Firestore sync are layered on top of that local-first design.
-- Prefer the existing normalization helpers in `src/lib` when storing tags, websites, or durations.
+- Prefer the existing normalization helpers in `src/lib` when storing tags or durations, and `src/features/blocking/sites.ts` when storing websites.
 
 ## Testing
 
@@ -49,7 +50,7 @@ This repository already has a working Vitest setup and a real test command.
 
 - Run tests with `npm run test`
 - Run the full validation command with `npm run test && npm run build`
-- Put pure logic tests next to the source under `src/lib/*.test.ts`
+- Put pure logic tests next to the source under `src/lib/*.test.ts` or `src/features/blocking/*.test.ts`
 - Test deterministic logic and edge cases rather than browser UI flows or extension chrome behavior
 - Keep the suite focused on data transformation, normalization, and time-window arithmetic, which are the logic-heavy areas in this codebase
 

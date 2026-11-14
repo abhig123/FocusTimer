@@ -1,4 +1,6 @@
-import { toFocusText, toPerDayText, normalizeWebsite } from "../lib/utils.js";
+import { toFocusText, toPerDayText } from "../lib/utils.js";
+import { createBlockingSettings } from "../features/blocking/settings.js";
+import type { SiteLists } from "../features/blocking/types.js";
 import {
   normalizeEndOfDayHour,
   getDayWindowStartMs,
@@ -30,15 +32,13 @@ const el = {
   sections: Array.from(document.querySelectorAll(".section-card")) as HTMLElement[]
 };
 
-type SettingsState = {
+type SettingsState = Partial<SiteLists> & {
   defaultDurationMin?: number;
   breakDurationMin?: number;
   endOfDayHour?: 23 | 0 | 1 | 2 | 3 | 4;
   endTimerSound?: "none" | "bell1" | "bell2";
   endBreakSound?: "none" | "bell1" | "bell2";
   toolbarDisplayMode?: "icon" | "time" | "progress";
-  blocklistSites?: string[];
-  allowlistSites?: string[];
 };
 
 type PublicState = {
@@ -77,8 +77,7 @@ type MessageResponse = {
   state?: PublicState;
 };
 
-let blocklistSitesState: string[] = [];
-let allowlistSitesState: string[] = [];
+const blockingSettings = createBlockingSettings(el, send);
 let lastActiveToolbarMode: "time" | "progress" = "time";
 let activeWeekOffset = 0;
 let latestState: PublicState | null = null;
@@ -356,129 +355,7 @@ function renderForm(state: PublicState): void {
     }
   }
 
-  blocklistSitesState = Array.isArray(settings.blocklistSites) ? [...settings.blocklistSites] : [];
-  allowlistSitesState = Array.isArray(settings.allowlistSites) ? [...settings.allowlistSites] : [];
-  renderSiteLists();
-}
-
-function getFaviconUrl(domain: string): string {
-  return `https://www.google.com/s2/favicons?sz=32&domain=${encodeURIComponent(domain)}`;
-}
-
-function createSiteIconElement(site: string): HTMLElement {
-  const icon = document.createElement("span");
-  icon.className = "site-icon";
-  icon.setAttribute("aria-hidden", "true");
-
-  const img = document.createElement("img");
-  img.src = getFaviconUrl(site);
-  img.alt = "";
-  img.className = "site-icon-img";
-
-  // Fallback text if image fails to load
-  const fallbackText = document.createElement("span");
-  fallbackText.className = "site-icon-fallback";
-  fallbackText.textContent = site.charAt(0).toUpperCase();
-
-  img.addEventListener("error", () => {
-    icon.classList.add("site-icon-fallback-active");
-  });
-
-  icon.append(img, fallbackText);
-  return icon;
-}
-
-function renderSiteList(container: HTMLUListElement | null, sites: string[], emptyText: string): void {
-  if (!container) return;
-
-  container.textContent = "";
-
-  if (!sites.length) {
-    const emptyItem = document.createElement("li");
-    emptyItem.className = "site-item muted";
-
-    const emptyTextNode = document.createElement("span");
-    emptyTextNode.className = "site-domain";
-    emptyTextNode.textContent = emptyText;
-
-    emptyItem.appendChild(emptyTextNode);
-    container.appendChild(emptyItem);
-    return;
-  }
-
-  for (const site of sites) {
-    const item = document.createElement("li");
-    item.className = "site-item";
-    item.dataset.site = site;
-
-    const icon = createSiteIconElement(site);
-
-    const domain = document.createElement("span");
-    domain.className = "site-domain";
-    domain.textContent = site;
-
-    const removeBtn = document.createElement("button");
-    removeBtn.className = "remove-site-btn";
-    removeBtn.type = "button";
-    removeBtn.dataset.site = site;
-    removeBtn.setAttribute("aria-label", `Remove ${site}`);
-    removeBtn.title = `Remove ${site}`;
-    removeBtn.textContent = "x";
-
-    item.append(icon, domain, removeBtn);
-    container.appendChild(item);
-  }
-}
-
-function renderSiteLists(): void {
-  renderSiteList(el.blocklistSites, blocklistSitesState, "No blocked websites yet");
-  renderSiteList(el.allowlistSites, allowlistSitesState, "No allowed websites yet");
-}
-
-async function persistLists(): Promise<void> {
-  const response = await send("UPDATE_SETTINGS", {
-    blocklistSites: blocklistSitesState,
-    allowlistSites: allowlistSitesState
-  });
-
-  if (response.state?.settings) {
-    blocklistSitesState = Array.isArray(response.state.settings.blocklistSites)
-      ? [...response.state.settings.blocklistSites]
-      : blocklistSitesState;
-    allowlistSitesState = Array.isArray(response.state.settings.allowlistSites)
-      ? [...response.state.settings.allowlistSites]
-      : allowlistSitesState;
-    renderSiteLists();
-  }
-}
-
-async function addSiteToList(which: "blocklist" | "allowlist", rawValue: string, inputEl: HTMLInputElement | null): Promise<void> {
-  const site = normalizeWebsite(rawValue);
-  if (!site) return;
-
-  const target = which === "blocklist" ? blocklistSitesState : allowlistSitesState;
-  if (target.includes(site)) return;
-
-  if (inputEl) inputEl.value = "";
-
-  target.push(site);
-  target.sort((a, b) => a.localeCompare(b));
-  renderSiteLists();
-  await persistLists();
-}
-
-async function removeSiteFromList(which: "blocklist" | "allowlist", site: string): Promise<void> {
-  const normalized = normalizeWebsite(site);
-  if (!normalized) return;
-
-  if (which === "blocklist") {
-    blocklistSitesState = blocklistSitesState.filter((value) => value !== normalized);
-  } else {
-    allowlistSitesState = allowlistSitesState.filter((value) => value !== normalized);
-  }
-
-  renderSiteLists();
-  await persistLists();
+  blockingSettings.setLists(settings);
 }
 
 function renderStats(state: PublicState): void {
@@ -537,8 +414,7 @@ async function autoSaveTimerSettings(): Promise<void> {
     endTimerSound: el.endTimerSound?.value || "bell1",
     endBreakSound: el.endBreakSound?.value || "bell2",
     toolbarDisplayMode: el.toolbarDisplayMode?.value || "icon",
-    blocklistSites: blocklistSitesState,
-    allowlistSites: allowlistSitesState
+    ...blockingSettings.getLists()
   };
 
   try {
@@ -589,36 +465,6 @@ function wireNavigation(): void {
       activateTab(targetId);
     });
   }
-}
-
-function wireSiteLists(): void {
-  el.blocklistInput?.addEventListener("keydown", (event) => {
-    if (event.key !== "Enter") return;
-    event.preventDefault();
-    void addSiteToList("blocklist", el.blocklistInput?.value || "", el.blocklistInput);
-  });
-
-  el.allowlistInput?.addEventListener("keydown", (event) => {
-    if (event.key !== "Enter") return;
-    event.preventDefault();
-    void addSiteToList("allowlist", el.allowlistInput?.value || "", el.allowlistInput);
-  });
-
-  el.blocklistSites?.addEventListener("click", (event) => {
-    const target = event.target as HTMLElement;
-    if (!target.classList.contains("remove-site-btn")) return;
-    const site = target.dataset.site;
-    if (!site) return;
-    void removeSiteFromList("blocklist", site);
-  });
-
-  el.allowlistSites?.addEventListener("click", (event) => {
-    const target = event.target as HTMLElement;
-    if (!target.classList.contains("remove-site-btn")) return;
-    const site = target.dataset.site;
-    if (!site) return;
-    void removeSiteFromList("allowlist", site);
-  });
 }
 
 function wireTimerFields(): void {
@@ -674,7 +520,7 @@ function wireTimerFields(): void {
 
 async function init(): Promise<void> {
   wireNavigation();
-  wireSiteLists();
+  blockingSettings.wireSiteLists();
   wireTimerFields();
   wireStatsNavigation();
 

@@ -51,3 +51,22 @@ Use rules that only allow authenticated user access to their own sessions path.
 - Pause commits elapsed focus time immediately to totals.
 - Reset finalizes the current session with any already-focused time.
 - Data is stored locally first, then synced when signed in.
+
+## Website blocking code
+
+Website blocking lives in `src/features/blocking/`:
+- `types.ts`: shared list modes, settings, and blocking reasons.
+- `sites.ts`: domain normalization, list deduplication, and subdomain matching.
+- `rules.ts`: pure URL rule evaluation using timer status and settings.
+- `enforcement.ts`: blocked-page URLs and Chrome tab redirects.
+- `settings.ts`: website-list rendering, events, and persistence through the settings-page message sender.
+- `mode.ts`: popup mode labels and hints.
+- `blocked.html`, `blocked.ts`, and `blocked.css`: the blocked page.
+
+The background entry point retains shared state, storage, and the tab-update listener.
+The popup and settings entry points wire the feature into their pages. Storage keys
+and message names are unchanged. Blocking still runs only while the timer is running
+and redirects tabs on updates rather than blocking network requests.
+
+Run `npm run test` and `npm run build`, then reload the unpacked extension.
+The blocked page loads compiled code from `src/gen/features/blocking/blocked.js`.
