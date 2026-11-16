@@ -1,4 +1,4 @@
-2 · Choose your task
+# 2 · Choose your task
 What the instructions require:
 A good task is real and checkable: something you actually want done, like the work you do every day. Use your own code, open-source code, or code you write for this task, and make sure it is safe to share. No PIIs, No old GitHub PR already solved by a human; the model can look up the answer.
 
@@ -47,7 +47,7 @@ I searched issues and pull requests: no person has published a fix for this
 I know whether I will work live or away
 My project's tools, versions and lockfile work on the machine above: no Docker, no internet, no npm packages newer than about two weeks
 
-3 · Prepare the codebase
+# 3 · Prepare the codebase
 The codebase travels on its own branch and pull request, so nothing about this project reaches the model.
 
 The codebase must be clean of everything but the code
@@ -69,13 +69,13 @@ Secrets, keys, PIIs, private code you can't publish. The check scans for credent
 Put the archive on the codebase branch
 From your clone of your fork (see Fork your task repo):
 
-# from your code's own git checkout: pin one commit, the code's own name as the single top folder
+ <!-- from your code's own git checkout: pin one commit, the code's own name as the single top folder -->
 git archive --format=zip --prefix=<project>/ -o <project>.zip <commit>
-# code not in git: zip -r <project>.zip <project>/ -x '<project>/node_modules/*' '<project>/.venv/*' '<project>/dist/*'
+<!-- code not in git: zip -r <project>.zip <project>/ -x '<project>/node_modules/*' '<project>/.venv/*' '<project>/dist/*' -->
 
-# then, in your clone of your fork
+<!-- then, in your clone of your fork -->
 git checkout codebase                 # the empty branch; NOT a branch off main
-# if git says the name is ambiguous (your clone has two remotes): git checkout --track origin/codebase
+<!-- if git says the name is ambiguous (your clone has two remotes): git checkout --track origin/codebase -->
 cp /path/to/<project>.zip .           # the archive is the only file on the branch
 git add <project>.zip
 git commit -m "codebase"
@@ -98,7 +98,9 @@ No dependency or build folders, no original .git, no oversized fixtures, and a .
 Nothing in the archive mentions this project, the task, Handshake, or an evaluation
 The pull request targets the codebase branch and is titled <task_code> codebase
 
-4.1 · Task description
+# 4
+
+## 4.1 · Task description
 What the task is and why it matters. It can assume the reviewer knows the codebase.
 
 Two paragraphs is ideal, three at most.
